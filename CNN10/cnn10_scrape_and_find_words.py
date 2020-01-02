@@ -2,6 +2,8 @@ import urllib.request
 from bs4 import BeautifulSoup
 import datetime
 import pandas as pd
+import os
+import slack
 
 
 def update_check(tar_date, recorded_date):
@@ -29,10 +31,16 @@ def find_target_words(text, tar_words_list):
         # 指定したリストの単語がふくまれていない場合Not Foundを返す
         return "Not Found"
 
+def post_message(client, channel, text):
+    # Slackにメッセージを投稿する
+    client.chat_postMessage(
+      channel=channel,
+      text=text
+    )
+
 
 # ターゲットとなる単語を指定
-# tar_words_list = ["Japan", "Japanese"]
-tar_words_list = input().split()
+tar_words_list = ["Japan", "Japanese"]
 
 # transcriptの一覧ページのURL
 base_url = "http://transcripts.cnn.com/"
@@ -64,11 +72,12 @@ for i, l in enumerate(link_soup):
     conv_date = datetime.datetime.strptime(date, '%Y%m%d')
 
     # 更新があったかどうかを確認し、なかった場合はforループを抜ける
-    flg = update_check(tar_date=conv_date, latest_date=init_date)
+    flg = update_check(tar_date=conv_date, recorded_date=init_date)
     if flg == -1:
         if i == 0:
             message = "本日の更新はありません" + "\n"
             message_list.append(message)
+            latest_date = date_str
         break
 
     if i == 0:  # リストの１件目が最新日付となるため0かどうかを判定する
@@ -98,9 +107,13 @@ for i, l in enumerate(link_soup):
         message = "Error:{}".format(tar_url)
         message_list.append(message)
 
+# slackへの投稿
+token = os.environ["SLACK_BOT_TOKEN"]
+client = slack.WebClient(token=token)
 for m in message_list:
-    with open("cnn10_result_20200101.txt", mode="a") as f:
-        f.write(m)
+    post_message(client, "#bot_notice", m)
+
+# 最新日付の更新
 with open("cnn10.init", mode="w") as f:
     f.write(latest_date)
 
