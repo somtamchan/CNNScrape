@@ -1,2 +1,13 @@
 
 *.csv
+.idea/libraries/R_User_Library.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/web-scraping.iml
+.idea/workspace.xml
+CNN10/.ipynb_checkpoints/cnn_scrape-checkpoint.ipynb
+CNN10/.ipynb_checkpoints/cnn_scrape_findJapan-checkpoint.ipynb
+CNN10/.ipynb_checkpoints/slack_test-checkpoint.ipynb
+CNN10/cnn10.init
+komachi/.ipynb_checkpoints/komachi_scrape-checkpoint.ipynb
